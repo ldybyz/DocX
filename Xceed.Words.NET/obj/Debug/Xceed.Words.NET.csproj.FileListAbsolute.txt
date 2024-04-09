@@ -1,0 +1,9 @@
+D:\文档\源码\DocX\Xceed.Words.NET\bin\Debug\Xceed.Words.NET.dll
+D:\文档\源码\DocX\Xceed.Words.NET\bin\Debug\Xceed.Words.NET.pdb
+D:\文档\源码\DocX\Xceed.Words.NET\bin\Debug\Xceed.Document.NET.dll
+D:\文档\源码\DocX\Xceed.Words.NET\bin\Debug\Xceed.Document.NET.pdb
+D:\文档\源码\DocX\Xceed.Words.NET\obj\Debug\Xceed.Words.NET.csproj.AssemblyReference.cache
+D:\文档\源码\DocX\Xceed.Words.NET\obj\Debug\Xceed.Words.NET.csproj.CoreCompileInputs.cache
+D:\文档\源码\DocX\Xceed.Words.NET\obj\Debug\Xceed.Words.NET.csproj.CopyComplete
+D:\文档\源码\DocX\Xceed.Words.NET\obj\Debug\Xceed.Words.NET.dll
+D:\文档\源码\DocX\Xceed.Words.NET\obj\Debug\Xceed.Words.NET.pdb

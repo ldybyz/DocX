@@ -1,0 +1,12 @@
+D:\文档\源码\DocX\Xceed.Words.NET.Examples\bin\Debug\Xceed.Words.NET.Examples.exe.config
+D:\文档\源码\DocX\Xceed.Words.NET.Examples\bin\Debug\Xceed.Words.NET.Examples.exe
+D:\文档\源码\DocX\Xceed.Words.NET.Examples\bin\Debug\Xceed.Words.NET.Examples.pdb
+D:\文档\源码\DocX\Xceed.Words.NET.Examples\bin\Debug\Xceed.Document.NET.dll
+D:\文档\源码\DocX\Xceed.Words.NET.Examples\bin\Debug\Xceed.Words.NET.dll
+D:\文档\源码\DocX\Xceed.Words.NET.Examples\bin\Debug\Xceed.Document.NET.pdb
+D:\文档\源码\DocX\Xceed.Words.NET.Examples\bin\Debug\Xceed.Words.NET.pdb
+D:\文档\源码\DocX\Xceed.Words.NET.Examples\obj\Debug\Xceed.Words.NET.Examples.csproj.AssemblyReference.cache
+D:\文档\源码\DocX\Xceed.Words.NET.Examples\obj\Debug\Xceed.Words.NET.Examples.csproj.CoreCompileInputs.cache
+D:\文档\源码\DocX\Xceed.Words.NET.Examples\obj\Debug\Xceed.Words.NET.Examples.csproj.CopyComplete
+D:\文档\源码\DocX\Xceed.Words.NET.Examples\obj\Debug\Xceed.Words.NET.Examples.exe
+D:\文档\源码\DocX\Xceed.Words.NET.Examples\obj\Debug\Xceed.Words.NET.Examples.pdb

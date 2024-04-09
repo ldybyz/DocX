@@ -1,0 +1,31 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "6a9b96d0-a011-4f33-8ee2-ac31c948cca9": {
+      "ProjectGuid": "6a9b96d0-a011-4f33-8ee2-ac31c948cca9",
+      "DisplayName": "Xceed.Words.NET",
+      "ColorIndex": 0
+    },
+    "e863d072-aa8b-4108-b5f1-785241b37f67": {
+      "ProjectGuid": "e863d072-aa8b-4108-b5f1-785241b37f67",
+      "DisplayName": "Xceed.Document.NET",
+      "ColorIndex": 1
+    },
+    "f3022bb7-0e40-4c80-a495-37feaf3671ab": {
+      "ProjectGuid": "f3022bb7-0e40-4c80-a495-37feaf3671ab",
+      "DisplayName": "Xceed.Words.NET.Examples",
+      "ColorIndex": 2
+    },
+    "c60a6ed4-5ecd-4b6e-b542-7a7b4b7741c6": {
+      "ProjectGuid": "c60a6ed4-5ecd-4b6e-b542-7a7b4b7741c6",
+      "DisplayName": "LimsDocX",
+      "ColorIndex": 3
+    },
+    "7c388d58-c2d4-408e-ba17-9a4a2e5b8d54": {
+      "ProjectGuid": "7c388d58-c2d4-408e-ba17-9a4a2e5b8d54",
+      "DisplayName": "ConsoleApp1",
+      "ColorIndex": 4
+    }
+  },
+  "NextColorIndex": 5
+}

@@ -1,0 +1,6 @@
+D:\文档\源码\DocX\Xceed.Document.NET\bin\Debug\Xceed.Document.NET.dll
+D:\文档\源码\DocX\Xceed.Document.NET\bin\Debug\Xceed.Document.NET.pdb
+D:\文档\源码\DocX\Xceed.Document.NET\obj\Debug\Xceed.Document.NET.csproj.CoreCompileInputs.cache
+D:\文档\源码\DocX\Xceed.Document.NET\obj\Debug\Xceed.Document.NET.dll
+D:\文档\源码\DocX\Xceed.Document.NET\obj\Debug\Xceed.Document.NET.pdb
+D:\文档\源码\DocX\Xceed.Document.NET\obj\Debug\Xceed.Document.NET.csproj.AssemblyReference.cache

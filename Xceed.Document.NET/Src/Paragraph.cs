@@ -3102,7 +3102,7 @@ namespace Xceed.Document.NET
             new XAttribute(XName.Get("ascii", Document.w.NamespaceName), fontFamily.Name),
             new XAttribute(XName.Get("hAnsi", Document.w.NamespaceName), fontFamily.Name),
             new XAttribute(XName.Get("cs", Document.w.NamespaceName), fontFamily.Name),
-            new XAttribute(XName.Get("eastAsia", Document.w.NamespaceName), fontFamily.Name),
+            //new XAttribute(XName.Get("eastAsia", Document.w.NamespaceName), fontFamily.Name),
           }
       );
 

@@ -1,0 +1,81 @@
+D:\VS\LimsDocX\LimsDocX\bin\Debug\LimsDocX.dll
+D:\VS\LimsDocX\LimsDocX\bin\Debug\LimsDocX.pdb
+D:\VS\LimsDocX\LimsDocX\obj\Debug\ResolveAssemblyReference.cache
+D:\VS\LimsDocX\LimsDocX\obj\Debug\LimsDocX.dll
+D:\VS\LimsDocX\LimsDocX\obj\Debug\LimsDocX.pdb
+C:\LimsDocX\LimsDocX\bin\Debug\LimsDocX.dll
+C:\LimsDocX\LimsDocX\bin\Debug\LimsDocX.pdb
+C:\LimsDocX\LimsDocX\obj\Debug\ResolveAssemblyReference.cache
+C:\LimsDocX\LimsDocX\obj\Debug\LimsDocX.dll
+C:\LimsDocX\LimsDocX\obj\Debug\LimsDocX.pdb
+E:\01 DesignFile\Office 集成\docx\LimsDocX\LimsDocX\bin\Debug\LimsDocX.dll
+E:\01 DesignFile\Office 集成\docx\LimsDocX\LimsDocX\bin\Debug\LimsDocX.pdb
+E:\01 DesignFile\Office 集成\docx\LimsDocX\LimsDocX\obj\Debug\LimsDocX.csprojResolveAssemblyReference.cache
+E:\01 DesignFile\Office 集成\docx\LimsDocX\LimsDocX\obj\Debug\LimsDocX.dll
+E:\01 DesignFile\Office 集成\docx\LimsDocX\LimsDocX\obj\Debug\LimsDocX.pdb
+C:\Users\Administrator\Desktop\LimsDocX\LimsDocX\bin\Debug\LimsDocX.dll
+C:\Users\Administrator\Desktop\LimsDocX\LimsDocX\bin\Debug\LimsDocX.pdb
+C:\Users\Administrator\Desktop\LimsDocX\LimsDocX\obj\Debug\LimsDocX.csprojResolveAssemblyReference.cache
+C:\Users\Administrator\Desktop\LimsDocX\LimsDocX\obj\Debug\LimsDocX.dll
+C:\Users\Administrator\Desktop\LimsDocX\LimsDocX\obj\Debug\LimsDocX.pdb
+C:\Users\Administrator\Desktop\office 插件\LimsDocX\LimsDocX\bin\Debug\LimsDocX.dll
+C:\Users\Administrator\Desktop\office 插件\LimsDocX\LimsDocX\bin\Debug\LimsDocX.pdb
+C:\Users\Administrator\Desktop\office 插件\LimsDocX\LimsDocX\obj\Debug\LimsDocX.dll
+C:\Users\Administrator\Desktop\office 插件\LimsDocX\LimsDocX\obj\Debug\LimsDocX.pdb
+C:\Users\Administrator\Desktop 2\LimsDocX\LimsDocX\bin\Debug\LimsDocX.pdb
+C:\Users\Administrator\Desktop 2\LimsDocX\LimsDocX\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Administrator\Desktop 2\LimsDocX\LimsDocX\obj\Debug\LimsDocX.dll
+C:\Users\Administrator\Desktop 2\LimsDocX\LimsDocX\obj\Debug\LimsDocX.pdb
+C:\Users\Administrator\Desktop 2\LimsDocX\LimsDocX\bin\Debug\LimsDocX.dll
+C:\Users\Administrator\Desktop\office 插件\LimsDocX\LimsDocX\obj\Debug\LimsDocX.csprojResolveAssemblyReference.cache
+C:\Users\Arron\Desktop\LimsDocX\LimsDocX\bin\Debug\LimsDocX.dll
+C:\Users\Arron\Desktop\LimsDocX\LimsDocX\bin\Debug\LimsDocX.pdb
+C:\Users\Arron\Desktop\LimsDocX\LimsDocX\obj\Debug\LimsDocX.dll
+C:\Users\Arron\Desktop\LimsDocX\LimsDocX\obj\Debug\LimsDocX.pdb
+C:\Users\Arron\Desktop\LimsDocX\LimsDocX\obj\Debug\LimsDocX.csprojResolveAssemblyReference.cache
+C:\Users\Arron\Desktop\食品水晶报表\LimsDocX\LimsDocX\bin\Debug\LimsDocX.dll
+C:\Users\Arron\Desktop\食品水晶报表\LimsDocX\LimsDocX\bin\Debug\LimsDocX.pdb
+C:\Users\Arron\Desktop\食品水晶报表\LimsDocX\LimsDocX\obj\Debug\LimsDocX.csprojResolveAssemblyReference.cache
+C:\Users\Arron\Desktop\食品水晶报表\LimsDocX\LimsDocX\obj\Debug\LimsDocX.dll
+C:\Users\Arron\Desktop\食品水晶报表\LimsDocX\LimsDocX\obj\Debug\LimsDocX.pdb
+D:\lims\LimsDocX\LimsDocX\bin\Debug\LimsDocX.dll
+D:\lims\LimsDocX\LimsDocX\bin\Debug\LimsDocX.pdb
+D:\lims\LimsDocX\LimsDocX\obj\Debug\LimsDocX.csproj.AssemblyReference.cache
+D:\lims\LimsDocX\LimsDocX\obj\Debug\LimsDocX.csproj.CoreCompileInputs.cache
+D:\lims\LimsDocX\LimsDocX\obj\Debug\LimsDocX.csproj.CopyComplete
+D:\lims\LimsDocX\LimsDocX\obj\Debug\LimsDocX.dll
+D:\lims\LimsDocX\LimsDocX\obj\Debug\LimsDocX.pdb
+C:\Users\lindy\Desktop\文档\LimsDocX\LimsDocX\LimsDocX\bin\Debug\LimsDocX.dll
+C:\Users\lindy\Desktop\文档\LimsDocX\LimsDocX\LimsDocX\bin\Debug\LimsDocX.pdb
+C:\Users\lindy\Desktop\文档\LimsDocX\LimsDocX\LimsDocX\obj\Debug\LimsDocX.csproj.AssemblyReference.cache
+C:\Users\lindy\Desktop\文档\LimsDocX\LimsDocX\LimsDocX\obj\Debug\LimsDocX.csproj.CoreCompileInputs.cache
+C:\Users\lindy\Desktop\文档\LimsDocX\LimsDocX\LimsDocX\obj\Debug\LimsDocX.csproj.CopyComplete
+C:\Users\lindy\Desktop\文档\LimsDocX\LimsDocX\LimsDocX\obj\Debug\LimsDocX.dll
+C:\Users\lindy\Desktop\文档\LimsDocX\LimsDocX\LimsDocX\obj\Debug\LimsDocX.pdb
+C:\Users\lindy\Desktop\文档\源码\LimsDocX\LimsDocX\LimsDocX\bin\Debug\LimsDocX.dll
+C:\Users\lindy\Desktop\文档\源码\LimsDocX\LimsDocX\LimsDocX\bin\Debug\LimsDocX.pdb
+C:\Users\lindy\Desktop\文档\源码\LimsDocX\LimsDocX\LimsDocX\obj\Debug\LimsDocX.csproj.AssemblyReference.cache
+C:\Users\lindy\Desktop\文档\源码\LimsDocX\LimsDocX\LimsDocX\obj\Debug\LimsDocX.csproj.CoreCompileInputs.cache
+C:\Users\lindy\Desktop\文档\源码\LimsDocX\LimsDocX\LimsDocX\obj\Debug\LimsDocX.csproj.CopyComplete
+C:\Users\lindy\Desktop\文档\源码\LimsDocX\LimsDocX\LimsDocX\obj\Debug\LimsDocX.dll
+C:\Users\lindy\Desktop\文档\源码\LimsDocX\LimsDocX\LimsDocX\obj\Debug\LimsDocX.pdb
+D:\文档\源码\NewLimsDocX\LimsDocX\LimsDocX\obj\Debug\LimsDocX.csproj.CoreCompileInputs.cache
+D:\文档\源码\NewLimsDocX\LimsDocX\LimsDocX\obj\Debug\LimsDocX.dll
+D:\文档\源码\NewLimsDocX\LimsDocX\LimsDocX\obj\Debug\LimsDocX.pdb
+D:\文档\源码\NewLimsDocX\LimsDocX\LimsDocX\bin\Debug\LimsDocX.dll
+D:\文档\源码\NewLimsDocX\LimsDocX\LimsDocX\bin\Debug\LimsDocX.pdb
+D:\文档\源码\NewLimsDocX\LimsDocX\LimsDocX\bin\Debug\Xceed.Document.NET.dll
+D:\文档\源码\NewLimsDocX\LimsDocX\LimsDocX\bin\Debug\Xceed.Words.NET.dll
+D:\文档\源码\NewLimsDocX\LimsDocX\LimsDocX\obj\Debug\LimsDocX.csproj.CopyComplete
+D:\文档\源码\NewLimsDocX\LimsDocX\LimsDocX\obj\Debug\LimsDocX.csproj.AssemblyReference.cache
+D:\文档\源码\DocX\LimsDocX\bin\Debug\LimsDocX.dll
+D:\文档\源码\DocX\LimsDocX\bin\Debug\LimsDocX.pdb
+D:\文档\源码\DocX\LimsDocX\bin\Debug\Xceed.Document.NET.dll
+D:\文档\源码\DocX\LimsDocX\bin\Debug\Xceed.Words.NET.dll
+D:\文档\源码\DocX\LimsDocX\bin\Debug\Xceed.Document.NET.pdb
+D:\文档\源码\DocX\LimsDocX\bin\Debug\Xceed.Words.NET.pdb
+D:\文档\源码\DocX\LimsDocX\obj\Debug\LimsDocX.csproj.AssemblyReference.cache
+D:\文档\源码\DocX\LimsDocX\obj\Debug\LimsDocX.csproj.CoreCompileInputs.cache
+D:\文档\源码\DocX\LimsDocX\obj\Debug\LimsDocX.csproj.CopyComplete
+D:\文档\源码\DocX\LimsDocX\obj\Debug\LimsDocX.dll
+D:\文档\源码\DocX\LimsDocX\obj\Debug\LimsDocX.pdb

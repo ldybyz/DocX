@@ -1,0 +1,15 @@
+D:\文档\源码\DocX\ConsoleApp1\bin\Debug\ConsoleApp1.exe.config
+D:\文档\源码\DocX\ConsoleApp1\bin\Debug\ConsoleApp1.exe
+D:\文档\源码\DocX\ConsoleApp1\bin\Debug\ConsoleApp1.pdb
+D:\文档\源码\DocX\ConsoleApp1\bin\Debug\LimsDocX.dll
+D:\文档\源码\DocX\ConsoleApp1\bin\Debug\Xceed.Document.NET.dll
+D:\文档\源码\DocX\ConsoleApp1\bin\Debug\Xceed.Words.NET.dll
+D:\文档\源码\DocX\ConsoleApp1\bin\Debug\LimsDocX.pdb
+D:\文档\源码\DocX\ConsoleApp1\bin\Debug\Xceed.Document.NET.pdb
+D:\文档\源码\DocX\ConsoleApp1\bin\Debug\Xceed.Words.NET.pdb
+D:\文档\源码\DocX\ConsoleApp1\obj\Debug\ConsoleApp1.csproj.AssemblyReference.cache
+D:\文档\源码\DocX\ConsoleApp1\obj\Debug\ConsoleApp1.csproj.SuggestedBindingRedirects.cache
+D:\文档\源码\DocX\ConsoleApp1\obj\Debug\ConsoleApp1.csproj.CoreCompileInputs.cache
+D:\文档\源码\DocX\ConsoleApp1\obj\Debug\ConsoleApp1.csproj.CopyComplete
+D:\文档\源码\DocX\ConsoleApp1\obj\Debug\ConsoleApp1.exe
+D:\文档\源码\DocX\ConsoleApp1\obj\Debug\ConsoleApp1.pdb
