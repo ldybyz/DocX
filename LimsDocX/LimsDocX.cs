@@ -14,6 +14,8 @@ using System.Text.RegularExpressions;
 using Xceed.Words.NET;
 using Xceed.Document.NET;
 using Formatting = Xceed.Document.NET.Formatting;
+using System.Runtime.CompilerServices;
+using System.Collections.ObjectModel;
 
 namespace npLimsDocX
 {
@@ -540,7 +542,7 @@ namespace npLimsDocX
 
             return tbl;
         }
-    
+
         public Table GenerateTable(DocX doc, string strXml, string replaceFlag, bool bEmptyParagraph, bool deleteReplaceFlag)
         {
             DataTable dt = XMLDeserialize(strXml);
@@ -889,7 +891,7 @@ namespace npLimsDocX
                 Paragraph p1 = tbl.InsertParagraphAfterSelf("");
 
             }
-            
+
             if (deleteReplaceFlag)
             {
                 RemoveParagraphByReplaceFlag(doc, replaceFlag);
@@ -1352,6 +1354,19 @@ namespace npLimsDocX
             return dt;
         }
 
+
+        public Boolean ReplaceFlagFromDoc(DocX doc, string replaceFlag, string newValue, string alignment, bool reg)
+        {
+            Func<string, string> ReplaceTextHandler = s => newValue;
+            var functionReplaceTextOptions = new FunctionReplaceTextOptions()
+            {
+                FindPattern = replaceFlag,
+                RegexMatchHandler = ReplaceTextHandler,
+                RegExOptions = RegexOptions.None
+            };
+            doc.ReplaceText(functionReplaceTextOptions);
+            return true;
+        }
         /// <summary>
         /// 替换字符串（替换标记）
         /// </summary>
@@ -1361,39 +1376,67 @@ namespace npLimsDocX
         /// <returns></returns>
         public Boolean ReplaceFlag(DocX doc, string replaceFlag, string newValue, string alignment)
         {
-            
-            Paragraph p = GetParagraphByReplaceFlag(doc, replaceFlag, alignment);
+            return ReplaceFlagByReg(doc, replaceFlag, newValue,alignment, false);
+        }
+        /// <summary>
+        /// 替换字符串（替换标记）
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="replaceFlag"></param>
+        /// <param name="newValue"></param>
+        /// <returns></returns>
+        public Boolean ReplaceFlagByReg(DocX doc, string replaceFlag, string newValue, string alignment,bool reg)
+        {
+
+            Paragraph p = GetParagraphByReplaceFlag_Reg(doc, replaceFlag, alignment,reg);
             int nIndex;
+            int replaceFlag_length;
             string newReplaceFlag;
             while (p != null)
             {
+                newReplaceFlag = replaceFlag;
+                //if (reg)
+                //{
+                //    MatchCollection matches = Regex.Matches(p.Text, replaceFlag);
+                //    if (matches.Count > 0)
+                //    {
+                //        newReplaceFlag = matches[0].Value;
+                //    }
+                //}
                 try
                 {
                     if (newValue.ToUpper().IndexOf("{U|") >= 0 || newValue.ToUpper().IndexOf("{D|") >= 0
                         || newValue.IndexOf("µ") >= 0 || newValue.ToString().IndexOf("μ") >= 0)
                     {
-                        nIndex = p.Text.ToString().IndexOf(replaceFlag);
+                        nIndex = p.Text.ToString().IndexOf(newReplaceFlag);
+                        replaceFlag_length = newReplaceFlag.Length;
                         p.RemoveText(nIndex, 1, false);
-                        p.RemoveText(nIndex + replaceFlag.Length - 2, 1, false);
-                        newReplaceFlag = replaceFlag.Replace( "】", "").Replace("【", "");
+                        p.RemoveText(nIndex + replaceFlag_length - 2, 1, false);
+                        newReplaceFlag = newReplaceFlag.Replace("】", "").Replace("【", "");
                         //兼容英文中括号
-                        newReplaceFlag = replaceFlag.Replace("]", "").Replace("[", "");
+                        newReplaceFlag = newReplaceFlag.Replace("]", "").Replace("[", "");
 
-                      
-                        p.ReplaceText(new StringReplaceTextOptions{SearchValue= newReplaceFlag,NewValue= newValue });
+                    }
 
-
-
-                          
+                    if (reg)
+                    {
+                        Func<string, string> ReplaceTextHandler = s => newValue;
+                        var functionReplaceTextOptions = new FunctionReplaceTextOptions()
+                        {
+                            FindPattern = newReplaceFlag,
+                            RegexMatchHandler = ReplaceTextHandler,
+                            RegExOptions = RegexOptions.None
+                        };
+                        p.ReplaceText(functionReplaceTextOptions);
                     }
                     else
                     {
-                        p.ReplaceText(new StringReplaceTextOptions { SearchValue = replaceFlag, NewValue = newValue });
+                        p.ReplaceText(new StringReplaceTextOptions { SearchValue = newReplaceFlag, NewValue = newValue });
                     }
                     #region 上标
                     int iBeginUp = -1;
                     Xceed.Document.NET.Formatting formattingUp = new Xceed.Document.NET.Formatting();
-                    formattingUp.Script = Script.superscript; 
+                    formattingUp.Script = Script.superscript;
                     while (p.Text.ToUpper().IndexOf("{U|") > 0)
                     {
                         iBeginUp = p.Text.ToUpper().IndexOf("{U|");
@@ -1466,7 +1509,7 @@ namespace npLimsDocX
                 {
                     continue;
                 }
-                p = GetParagraphByReplaceFlag(doc, replaceFlag, alignment);
+                p = GetParagraphByReplaceFlag_Reg(doc, replaceFlag, alignment,reg);
             }
             return true;
         }
@@ -1545,6 +1588,10 @@ namespace npLimsDocX
             return pic;
         }
 
+
+
+
+
         /// <summary>
         /// 插入图片,图片放在word中，可以在Word自定义图片的格式(图片尺寸，布局等)
         /// </summary>
@@ -1592,6 +1639,7 @@ namespace npLimsDocX
             }
         }
 
+
         /// <summary>
         /// 根据字符串获取字符串所在段落
         /// </summary>
@@ -1599,6 +1647,16 @@ namespace npLimsDocX
         /// <param name="replaceFlag"></param>
         /// <returns></returns>
         public Paragraph GetParagraphByReplaceFlag(DocX doc, string replaceFlag, string alignment)
+        {
+            return GetParagraphByReplaceFlag_Reg(doc, replaceFlag, alignment, false);
+        }
+        /// <summary>
+        /// 根据字符串获取字符串所在段落
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="replaceFlag"></param>
+        /// <returns></returns>
+        public Paragraph GetParagraphByReplaceFlag_Reg(DocX doc, string replaceFlag, string alignment,bool reg =false)
         {
             List<Paragraph> lstParagraphInHeaderFirst = null;
             List<Paragraph> lstParagraphInHeaderOdd = null;
@@ -1609,31 +1667,31 @@ namespace npLimsDocX
 
             if (doc.Headers.First != null)
             {
-                lstParagraphInHeaderFirst = doc.Headers.First.Paragraphs.Where(paragraph => paragraph.Text.Trim().Contains(replaceFlag)).ToList<Paragraph>();
+                lstParagraphInHeaderFirst = GetParagraphFromParagraph(doc.Headers.First.Paragraphs,replaceFlag,reg);
             }
             if (doc.Headers.Odd != null)
             {
-                lstParagraphInHeaderOdd = doc.Headers.Odd.Paragraphs.Where(paragraph => paragraph.Text.Trim().Contains(replaceFlag)).ToList<Paragraph>();
+                lstParagraphInHeaderOdd = GetParagraphFromParagraph(doc.Headers.Odd.Paragraphs, replaceFlag, reg);
             }
             if (doc.Headers.Even != null)
             {
-                lstParagraphInHeaderEven = doc.Headers.Even.Paragraphs.Where(paragraph => paragraph.Text.Trim().Contains(replaceFlag)).ToList<Paragraph>();
+                lstParagraphInHeaderEven = GetParagraphFromParagraph(doc.Headers.Even.Paragraphs, replaceFlag, reg);
             }
             if (doc.Footers.First != null)
             {
-                lstParagraphInFooterFirst = doc.Footers.First.Paragraphs.Where(paragraph => paragraph.Text.Trim().Contains(replaceFlag)).ToList<Paragraph>();
+                lstParagraphInFooterFirst = GetParagraphFromParagraph(doc.Footers.First.Paragraphs, replaceFlag, reg);
             }
             if (doc.Footers.Odd != null)
             {
-                lstParagraphInFooterOdd = doc.Footers.Odd.Paragraphs.Where(paragraph => paragraph.Text.Trim().Contains(replaceFlag)).ToList<Paragraph>();
+                lstParagraphInFooterOdd = GetParagraphFromParagraph(doc.Footers.Odd.Paragraphs, replaceFlag, reg);   
             }
             if (doc.Footers.Even != null)
             {
-                lstParagraphInFooterEven = doc.Footers.Even.Paragraphs.Where(paragraph => paragraph.Text.Trim().Contains(replaceFlag)).ToList<Paragraph>();
+                lstParagraphInFooterEven = GetParagraphFromParagraph(doc.Footers.Even.Paragraphs, replaceFlag, reg);
             }
 
 
-            List<Paragraph> lstParagraph = doc.Paragraphs.Where(paragraph => paragraph.Text.Trim().Contains(replaceFlag)).ToList<Paragraph>();
+            List<Paragraph> lstParagraph = GetParagraphFromParagraph(doc.Paragraphs, replaceFlag, reg);
 
             Paragraph p = null;
             Boolean bBreakOutOfFor = false;
@@ -1707,7 +1765,7 @@ namespace npLimsDocX
                     {
                         for (int n = 0; n < lstTables[i].Rows[m].Cells.Count; n++)
                         {
-                            List<Paragraph> lstParagraphInCell = lstTables[i].Rows[m].Cells[n].Paragraphs.Where(paragraph => paragraph.Text.Trim().Contains(replaceFlag)).ToList<Paragraph>();
+                            List<Paragraph> lstParagraphInCell = GetParagraphFromParagraph(lstTables[i].Rows[m].Cells[n].Paragraphs, replaceFlag, reg);  
 
                             if (lstParagraphInCell.Count != 0)
                             {
@@ -1766,8 +1824,8 @@ namespace npLimsDocX
                     p.Alignment = Alignment.both;
                 }
             }
-           
-            
+
+
             return p;
         }
 
@@ -1870,7 +1928,7 @@ namespace npLimsDocX
 
                     }
                 }
-                
+
             }
             else
             {
@@ -1896,7 +1954,7 @@ namespace npLimsDocX
         /// <returns></returns>
         public DocX DocUnitAsOne(DocX oldDocument, DocX newDocument)
         {
-            oldDocument.InsertDocument(newDocument);
+            oldDocument.InsertDocument(newDocument, true, true);
             oldDocument.Save();
             return oldDocument;
         }
@@ -1936,12 +1994,469 @@ namespace npLimsDocX
         /// </summary>
         /// <param name="doc"></param>
         /// <param name="replaceFlag"></param>
-        public void RemoveParagraphByReplaceFlag(DocX doc,string replaceFlag)
+        public void RemoveParagraphByReplaceFlag(DocX doc, string replaceFlag)
         {
             Paragraph rp = GetParagraphByReplaceFlag(doc, replaceFlag, "LEFT");
-            rp.Remove(false);
+            if (rp != null)
+            {
+                rp.Remove(false);
+            }
         }
 
+        /// <summary>
+        /// 通过替换字段自动换行
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="replaceFlag"></param>
+        /// <param name="newValue"></param>
+        /// <param name="alignment"></param>
+        /// <returns></returns>
+        public bool InsertParagraphByReplaceFlag(DocX doc, string replaceFlag, string newValue, string alignment)
+        {
+
+
+            Paragraph p = GetParagraphByReplaceFlag(doc, replaceFlag, alignment);
+
+            //获取当前段落最后文本的格式
+            var formattedTexts = p.MagicText;
+            Xceed.Document.NET.Formatting formatting = formattedTexts.Last().formatting;
+
+            while (p != null)
+            {
+                try
+                {
+
+                    string[] array = newValue.Split('\n');
+
+                    var currentParagraph = p;
+                    for (int i = 0; i < array.Length; i++)
+                    {
+                        if (i == 0)
+                        {
+                            currentParagraph.ReplaceText(new StringReplaceTextOptions { SearchValue = replaceFlag, NewValue = array[i] });
+                        }
+                        else
+                        {
+
+                            var newParagraph = currentParagraph.InsertParagraphAfterSelf(array[i], false, formatting);
+                            currentParagraph = newParagraph;
+                        }
+
+                    }
+
+                }
+                catch (System.NullReferenceException e)
+                {
+                    continue;
+                }
+                p = GetParagraphByReplaceFlag(doc, replaceFlag, alignment);
+            }
+            return true;
+        }
+
+        public Boolean ReplaceBookmark(DocX doc, string replaceFlag, string newValue, string alignment)
+        {
+
+            var bookmarks = doc.Bookmarks.Where(x => x.Name == replaceFlag);
+
+            foreach (var bookmark in bookmarks)
+            {
+                //bookmark.Paragraph.ReplaceAtBookmark(newValue, replaceFlag);
+
+                bookmark.SetText(newValue);
+                //var str = bookmark.Paragraph.MagicText;
+            }
+
+            return true;
+        }
+
+        public void InsertPictureByBookMark(DocX doc, string replaceFlag, string imgPath, string alignment, double height, double width)
+        {
+            height = height / OldVersionFactor;
+            width = width / OldVersionFactor;
+
+
+            Picture pic = InsertPictureByBookMark(doc, replaceFlag, imgPath, alignment);
+
+            if (pic == null)
+            {
+                return;
+            }
+
+            if (Convert.ToInt32(height) == 0 && Convert.ToInt32(width) == 0)
+            {
+                return;
+            }
+            else if (Convert.ToInt32(height) == 0)
+            {
+                height = Convert.ToDouble(pic.Height) / Convert.ToDouble(pic.Width) * width;
+            }
+            else if (Convert.ToInt32(width) == 0)
+            {
+                width = Convert.ToDouble(pic.Width) / Convert.ToDouble(pic.Height) * height;
+            }
+            pic.Height = Convert.ToInt32(height);
+            pic.Width = Convert.ToInt32(width);
+
+        }
+
+
+        public Picture InsertPictureByBookMark(DocX doc, string replaceFlag, string imgPath, string alignment)
+        {
+            Bookmark bookmark = null;
+            try
+            {
+                bookmark = doc.Bookmarks.Where(x => x.Name == replaceFlag).FirstOrDefault();
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+
+
+            if (bookmark == null)
+            {
+                return null;
+            }
+
+            var p = bookmark.Paragraph;
+
+            var currentpic = p.Pictures.FirstOrDefault();
+
+
+            if (string.IsNullOrWhiteSpace(imgPath))
+            {
+                if (currentpic != null)
+                {
+
+                    currentpic.Remove();
+                }
+                return null;
+            }
+
+            Xceed.Document.NET.Image img = null;
+            try
+            {
+                img = doc.AddImage(imgPath);
+            }
+            catch (System.InvalidOperationException e)
+            {
+                return null;
+            }
+
+            Picture pic = img.CreatePicture();
+
+            if (currentpic == null)
+            {
+                p.AppendPicture(pic);
+            }
+            else
+            {
+                p.ReplacePicture(currentpic, pic);
+            }
+
+
+
+            pic.Height = Convert.ToInt32(Convert.ToDouble(pic.Height) / Convert.ToDouble(pic.Width) * Convert.ToDouble(doc.PageWidth - doc.MarginLeft - doc.MarginRight));
+            pic.Width = Convert.ToInt32(Convert.ToDouble(doc.PageWidth - doc.MarginLeft - doc.MarginRight));
+            return pic;
+        }
+
+        public Table InsertTableRows(DocX doc, string strXml, int tableIndex, int rowStartIndex, bool ignorefirstrow = true, bool ignorefirstColumn = true)
+        {
+            DataTable dt = XMLDeserialize(strXml);
+            if (ignorefirstrow && dt.Rows.Count > 0)
+            {
+                dt.Rows.RemoveAt(0);
+            }
+            int nRow = dt.Rows.Count;
+            int nCol = dt.Columns.Count;
+
+            var tbl = doc.Tables[tableIndex];
+            Row row = tbl.Rows[rowStartIndex - 1];
+
+            #region 从表格中插入数据
+            for (int i = nRow - 1; i >= 0; i--)
+            {
+                var newRow = tbl.InsertRow(row, rowStartIndex, true);
+
+                //给单元格赋值，并跳过UP和LE
+                for (int j = nCol - 1; j >= 0; j--)
+                {
+                    if (dt.Rows[i][j].ToString().ToUpper().Trim() == "UP" || dt.Rows[i][j].ToString().ToUpper().Trim() == "LE")
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        //跳过序号
+                        if (ignorefirstColumn)
+                        {
+                            if (j > 0)
+                            {
+                                newRow.Cells[j].Paragraphs[0].Append(dt.Rows[i][j].ToString());
+                            }
+                        }
+                        else
+                        {
+                            newRow.Cells[j].Paragraphs[0].Append(dt.Rows[i][j].ToString());
+                        }
+                    }
+                    FormatCell(newRow.Cells[j]);
+                }
+            }
+            #endregion
+
+            //合并单元格
+            MergeTableCells(tbl, rowStartIndex, dt);
+
+            tbl.RemoveRow(rowStartIndex - 1);
+            //for (int i = 0; i < tbl.Rows.Count; i++)
+            //{
+            //    tbl.Rows[i].BreakAcrossPages = false;
+            //}
+
+            return tbl;
+        }
+
+        /// <summary>
+        /// 格式化单元格
+        /// </summary>
+        /// <param name="cell"></param>
+        /// <returns></returns>
+        private Cell FormatCell(Cell cell)
+        {
+            #region 科学计数法 & 上下标
+            int nParagraphs = cell.Paragraphs.Count;//看这个单元格有多少paragraphs
+            for (int iParagraphs = 0; iParagraphs < nParagraphs; iParagraphs++)
+            {
+                String sComment1 = cell.Paragraphs[iParagraphs].Text.ToUpper();
+
+                if (sComment1.IndexOf("*10E") > 0)
+                {
+                    string sCellText = cell.Paragraphs[iParagraphs].Text.Replace("*10e", "×10{U|").Replace("*10E", "×10{U|");
+                    if (sCellText.IndexOf("×10{U|") > 0 && sCellText.IndexOf("}") < 0)
+                    {
+                        sCellText += "}";
+                    }
+                    cell.Paragraphs[iParagraphs].RemoveText(0, sComment1.Length);
+                    cell.Paragraphs[iParagraphs].InsertText(sCellText);
+                }
+
+                String sComment = cell.Paragraphs[iParagraphs].Text.ToUpper();
+                if (sComment.IndexOf("E") > 0)
+                {
+                    string sPre = sComment.Substring(0, sComment.IndexOf("E"));
+                    string sZhishu = sComment.Substring(sComment.IndexOf("E") + 1, sComment.Length - sComment.IndexOf("E") - 1);
+                    if ((Regex.IsMatch(sPre, @"^\d+\.\d+$") || Regex.IsMatch(sPre, @"^\d+$") || Regex.IsMatch(sPre, @"^[-]+\d+$") || Regex.IsMatch(sPre, @"^[-]+\d+\.\d+$"))
+                            && (Regex.IsMatch(sZhishu, @"^\d+$") || Regex.IsMatch(sZhishu, @"^[-]+\d+$")))
+                    {
+                        cell.Paragraphs[iParagraphs].RemoveText(0, sComment.Length);
+                        cell.Paragraphs[iParagraphs].InsertText(Convert.ToDecimal(sPre).ToString() + "×10{U|" + Int32.Parse(sZhishu).ToString() + "}");
+                    }
+                }
+            }
+            for (int iParagraphs = 0; iParagraphs < nParagraphs; iParagraphs++)
+            {
+                #region 上标
+                int iBeginUp = -1;
+                Xceed.Document.NET.Formatting formattingUp = new Xceed.Document.NET.Formatting();
+                formattingUp.Script = Script.superscript;
+
+                while (cell.Paragraphs[iParagraphs].Text.ToUpper().IndexOf("{U|") > 0)
+                {
+                    iBeginUp = cell.Paragraphs[iParagraphs].Text.ToUpper().IndexOf("{U|");
+                    int iEndUp = -1;
+                    for (iEndUp = iBeginUp + 3; iEndUp < cell.Paragraphs[iParagraphs].Text.Length; iEndUp++)
+                    {
+                        if (cell.Paragraphs[iParagraphs].Text.Substring(iEndUp, 1) == "}")
+                        {
+                            break;
+                        }
+                    }
+                    if ((iBeginUp + 3) != iEndUp)
+                    {
+                        string strSub = cell.Paragraphs[iParagraphs].Text.Substring(iBeginUp + 3, iEndUp - iBeginUp - 3);
+                        cell.Paragraphs[iParagraphs].RemoveText(iBeginUp, iEndUp - iBeginUp + 1);
+                        cell.Paragraphs[iParagraphs].InsertText(iBeginUp, strSub, false, formattingUp);
+                    }
+
+                }
+                #endregion 上标
+
+                #region 下标
+                int iBeginDown = -1;
+                Xceed.Document.NET.Formatting formattingDown = new Xceed.Document.NET.Formatting();
+                formattingDown.Script = Script.subscript;
+
+                while (cell.Paragraphs[iParagraphs].Text.ToUpper().IndexOf("{D|") > 0)
+                {
+                    iBeginDown = cell.Paragraphs[iParagraphs].Text.ToUpper().IndexOf("{D|");
+                    int iEndDown = -1;
+                    for (iEndDown = iBeginDown + 3; iEndDown < cell.Paragraphs[iParagraphs].Text.Length; iEndDown++)
+                    {
+                        if (cell.Paragraphs[iParagraphs].Text.Substring(iEndDown, 1) == "}")
+                        {
+                            break;
+                        }
+                    }
+                    if ((iBeginDown + 3) != iEndDown)
+                    {
+                        string strSub = cell.Paragraphs[iParagraphs].Text.Substring(iBeginDown + 3, iEndDown - iBeginDown - 3);
+                        cell.Paragraphs[iParagraphs].RemoveText(iBeginDown, iEndDown - iBeginDown + 1);
+                        cell.Paragraphs[iParagraphs].InsertText(iBeginDown, strSub, false, formattingDown);
+                    }
+                }
+                #endregion 下标
+
+                #region μ转换成Times New Roman
+                int iBegin_u = -1;
+                Xceed.Document.NET.Formatting formatting_u = new Xceed.Document.NET.Formatting();
+                formatting_u.FontFamily = new Xceed.Document.NET.Font("Times New Roman");
+                iBegin_u = cell.Paragraphs[iParagraphs].Text.ToString().IndexOf("µ");
+                while (iBegin_u >= 0)
+                {
+                    cell.Paragraphs[iParagraphs].RemoveText(iBegin_u, 1);
+                    cell.Paragraphs[iParagraphs].InsertText(iBegin_u, "µ", false, formatting_u);
+                    iBegin_u = cell.Paragraphs[iParagraphs].Text.ToString().IndexOf("µ", iBegin_u + 1);
+                }
+
+                iBegin_u = cell.Paragraphs[iParagraphs].Text.ToString().IndexOf("μ");
+                while (iBegin_u >= 0)
+                {
+                    cell.Paragraphs[iParagraphs].RemoveText(iBegin_u, 1);
+                    cell.Paragraphs[iParagraphs].InsertText(iBegin_u, "μ", false, formatting_u);
+                    iBegin_u = cell.Paragraphs[iParagraphs].Text.ToString().IndexOf("μ", iBegin_u + 1);
+                }
+                #endregion μ转换成Times New Roman
+            }
+
+            #endregion 上下标
+
+            return cell;
+        }
+
+        /// <summary>
+        /// 合并单元格
+        /// </summary>
+        /// <param name="tbl"></param>
+        /// <param name="tbStartIndex"></param>
+        /// <param name="dt"></param>
+        /// <returns></returns>
+        private Table MergeTableCells(Table tbl, int tbStartIndex, DataTable dt)
+        {
+            int nRow = dt.Rows.Count;
+            int nCol = dt.Columns.Count;
+
+            int[] aRowNCol = new int[nRow];//每一行有多少列
+
+            #region 数组：每行有多少列
+            //目的是由于合并情况的出现会导致每行列数减少，但是合并单元格以后行不会减少
+            for (int i = 0; i < aRowNCol.Length; i++)
+            {
+                aRowNCol[i] = nCol;
+            }
+            #endregion 数组：每行有多少列
+
+            #region 合并单元格,从右下角往左上角扫
+            int nLe;
+            int nUp;
+
+            for (int j = nCol - 1; j >= 0; j--)
+            {
+                for (int i = nRow - 1; i >= 0; i--)
+                {
+                    nUp = 0;
+                    nLe = 0;
+
+                    if (dt.Rows[i][j].ToString().ToUpper().Trim() == "UP" || dt.Rows[i][j].ToString().ToUpper().Trim() == "LE")
+                    {
+                        continue;
+                    }
+                    for (int n = i + 1; n < nRow; n++)
+                    {
+                        if (dt.Rows[n][j].ToString().ToUpper().Trim() == "UP")
+                        {
+                            aRowNCol[n] -= 1;
+                            nUp++;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    for (int m = j + 1; m < aRowNCol[i]; m++)
+                    {
+                        if (dt.Rows[i][m].ToString().ToUpper().Trim() == "LE")
+                        {
+                            nLe++;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    #region 合并行
+                    if (nUp > 0)
+                    {
+                        try
+                        {
+                            tbl.MergeCellsInColumn(j, tbStartIndex + i, tbStartIndex + i + nUp);
+                        }
+                        catch (System.ArgumentOutOfRangeException e)
+                        {
+                            continue;
+                        }
+                    }
+                    #endregion 合并行
+
+                    if (nLe > 0)
+                    {
+                        aRowNCol[i] -= nLe;
+                        try
+                        {
+                            tbl.Rows[tbStartIndex + i].MergeCells(j, j + nLe);
+                        }
+                        catch (System.ArgumentOutOfRangeException e)
+                        {
+                            continue;
+                        }
+
+                        if (nUp > 0)
+                        {
+                            for (int l = i + 1; l <= i + nUp; l++)
+                            {
+                                try
+                                {
+                                    //tbl.Rows[tbStartIndex+1].MergeCells(j, j + nLe);
+                                }
+                                catch (System.ArgumentOutOfRangeException e)
+                                {
+                                    continue;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            #endregion 合并单元格,从右下角往左上角扫
+
+            return tbl;
+        }
+
+
+        private List<Paragraph> GetParagraphFromParagraph(ReadOnlyCollection<Paragraph> paragraphs, string replaceFlag, bool reg = false)
+        {
+            if (reg)
+            {
+                return paragraphs.Where(p => Regex.IsMatch(p.Text.Trim(), replaceFlag)).ToList();
+            }
+            else
+            {
+                return paragraphs.Where(p => p.Text.Trim().Contains(replaceFlag)).ToList();
+            }
+        }
 
 
         #region DEMO=======================================================================================================================================

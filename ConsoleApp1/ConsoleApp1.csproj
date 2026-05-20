@@ -35,6 +35,9 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\net461\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -48,11 +51,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LimsDocX\LimsDocX.csproj">
       <Project>{c60a6ed4-5ecd-4b6e-b542-7a7b4b7741c6}</Project>
       <Name>LimsDocX</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LimsFileHelper\LimsFileHelper.csproj">
+      <Project>{68edcee2-20fc-464f-882f-bd0405380a05}</Project>
+      <Name>LimsFileHelper</Name>
     </ProjectReference>
     <ProjectReference Include="..\Xceed.Document.NET\Xceed.Document.NET.csproj">
       <Project>{e863d072-aa8b-4108-b5f1-785241b37f67}</Project>

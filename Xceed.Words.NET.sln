@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LimsDocX", "LimsDocX\LimsDo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{7C388D58-C2D4-408E-BA17-9A4A2E5B8D54}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LimsFileHelper", "LimsFileHelper\LimsFileHelper.csproj", "{68EDCEE2-20FC-464F-882F-BD0405380A05}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -120,6 +122,24 @@ Global
 		{7C388D58-C2D4-408E-BA17-9A4A2E5B8D54}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{7C388D58-C2D4-408E-BA17-9A4A2E5B8D54}.Release|x86.ActiveCfg = Release|Any CPU
 		{7C388D58-C2D4-408E-BA17-9A4A2E5B8D54}.Release|x86.Build.0 = Release|Any CPU
+		{68EDCEE2-20FC-464F-882F-BD0405380A05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68EDCEE2-20FC-464F-882F-BD0405380A05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68EDCEE2-20FC-464F-882F-BD0405380A05}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{68EDCEE2-20FC-464F-882F-BD0405380A05}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{68EDCEE2-20FC-464F-882F-BD0405380A05}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{68EDCEE2-20FC-464F-882F-BD0405380A05}.Debug|x86.Build.0 = Debug|Any CPU
+		{68EDCEE2-20FC-464F-882F-BD0405380A05}.PerformanceTest|Any CPU.ActiveCfg = Debug|Any CPU
+		{68EDCEE2-20FC-464F-882F-BD0405380A05}.PerformanceTest|Any CPU.Build.0 = Debug|Any CPU
+		{68EDCEE2-20FC-464F-882F-BD0405380A05}.PerformanceTest|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{68EDCEE2-20FC-464F-882F-BD0405380A05}.PerformanceTest|Mixed Platforms.Build.0 = Debug|Any CPU
+		{68EDCEE2-20FC-464F-882F-BD0405380A05}.PerformanceTest|x86.ActiveCfg = Debug|Any CPU
+		{68EDCEE2-20FC-464F-882F-BD0405380A05}.PerformanceTest|x86.Build.0 = Debug|Any CPU
+		{68EDCEE2-20FC-464F-882F-BD0405380A05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68EDCEE2-20FC-464F-882F-BD0405380A05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68EDCEE2-20FC-464F-882F-BD0405380A05}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{68EDCEE2-20FC-464F-882F-BD0405380A05}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{68EDCEE2-20FC-464F-882F-BD0405380A05}.Release|x86.ActiveCfg = Release|Any CPU
+		{68EDCEE2-20FC-464F-882F-BD0405380A05}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
