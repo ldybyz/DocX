@@ -1947,6 +1947,240 @@ namespace npLimsDocX
             return tbl;
         }
         /// <summary>
+        /// 单页自适应：通过压缩空白行行高使报告控制在1页内
+        /// 计算页面可用高度，减去表格外固定内容高度和数据行高度，将剩余空间平均分配给空白行
+        /// </summary>
+        /// <param name="doc">文档对象</param>
+        /// <param name="tbl">报告主表格</param>
+        /// <param name="fixedContentHeightCm">表格外固定内容的高度（cm），如标题、备注、声明等</param>
+        /// <param name="emptyRowStartIndex">空白行起始行索引（从0开始）</param>
+        /// <param name="emptyRowEndIndex">空白行结束行索引（从0开始，包含）</param>
+        /// <param name="minRowHeightCm">空白行最小行高（cm），防止压缩过度，默认0.15</param>
+        /// <returns></returns>
+        public Table FitTableOnSinglePage(DocX doc, Table tbl, double fixedContentHeightCm, int emptyRowStartIndex, int emptyRowEndIndex, double minRowHeightCm)
+        {
+            if (tbl == null || emptyRowStartIndex < 0 || emptyRowEndIndex < emptyRowStartIndex)
+            {
+                return tbl;
+            }
+            if (emptyRowEndIndex >= tbl.Rows.Count)
+            {
+                emptyRowEndIndex = tbl.Rows.Count - 1;
+            }
+
+            // 页面可用高度（pt）= 页面高度 - 上下边距
+            double availableHeightPt = (doc.PageHeight - doc.MarginTop - doc.MarginBottom) / OldVersionFactor;
+
+            // 表格外固定内容高度（cm → pt）
+            double fixedContentHeightPt = fixedContentHeightCm / 0.0353;
+
+            // 估算数据行（非空白行）总高度（pt）
+            double dataRowsHeightPt = 0;
+            for (int i = 0; i < tbl.Rows.Count; i++)
+            {
+                if (i >= emptyRowStartIndex && i <= emptyRowEndIndex)
+                    continue;
+                dataRowsHeightPt += EstimateRowHeight(tbl.Rows[i]);
+            }
+
+            // 计算空白行可用的总高度
+            int emptyRowCount = emptyRowEndIndex - emptyRowStartIndex + 1;
+            double remainingPt = availableHeightPt - fixedContentHeightPt - dataRowsHeightPt;
+
+            if (remainingPt <= 0 || emptyRowCount <= 0)
+            {
+                // 空间已不足，将空白行设为最小行高
+                double minHeightPt = minRowHeightCm / 0.0353;
+                for (int i = emptyRowStartIndex; i <= emptyRowEndIndex; i++)
+                {
+                    tbl.Rows[i].Height = minHeightPt;
+                    foreach (var p in tbl.Rows[i].Paragraphs)
+                    {
+                        p.SpacingBefore(0);
+                        p.SpacingAfter(0);
+                        p.SetLineSpacing(LineSpacingType.Line, 0.8f);
+                    }
+                }
+                return tbl;
+            }
+
+            // 每个空白行分配的高度（pt）
+            double heightPerRowPt = remainingPt / emptyRowCount;
+            double minPt = minRowHeightCm / 0.0353;
+            if (heightPerRowPt < minPt)
+            {
+                heightPerRowPt = minPt;
+            }
+
+            for (int i = emptyRowStartIndex; i <= emptyRowEndIndex; i++)
+            {
+                tbl.Rows[i].Height = heightPerRowPt;
+                foreach (var p in tbl.Rows[i].Paragraphs)
+                {
+                    p.SpacingBefore(0);
+                    p.SpacingAfter(0);
+                }
+            }
+
+            return tbl;
+        }
+
+        /// <summary>
+        /// 单页自适应（自动检测空白行版本）：自动查找表格中内容为空的连续行并压缩
+        /// </summary>
+        /// <param name="doc">文档对象</param>
+        /// <param name="tbl">报告主表格</param>
+        /// <param name="fixedContentHeightCm">表格外固定内容的高度（cm）</param>
+        /// <param name="minRowHeightCm">空白行最小行高（cm），默认0.15</param>
+        /// <returns></returns>
+        public Table FitTableOnSinglePageAuto(DocX doc, Table tbl, double fixedContentHeightCm, double minRowHeightCm)
+        {
+            if (tbl == null)
+            {
+                return tbl;
+            }
+
+            // 从最后一行往前扫描，找到连续空白行的范围
+            int emptyRowEndIndex = -1;
+            int emptyRowStartIndex = -1;
+
+            for (int i = tbl.Rows.Count - 1; i >= 0; i--)
+            {
+                bool isEmpty = true;
+                foreach (var cell in tbl.Rows[i].Cells)
+                {
+                    foreach (var p in cell.Paragraphs)
+                    {
+                        if (!string.IsNullOrWhiteSpace(p.Text))
+                        {
+                            isEmpty = false;
+                            break;
+                        }
+                    }
+                    if (!isEmpty) break;
+                }
+
+                if (isEmpty)
+                {
+                    if (emptyRowEndIndex == -1)
+                        emptyRowEndIndex = i;
+                    emptyRowStartIndex = i;
+                }
+                else
+                {
+                    if (emptyRowEndIndex != -1)
+                        break;
+                }
+            }
+
+            if (emptyRowStartIndex == -1 || emptyRowEndIndex == -1)
+            {
+                return tbl;
+            }
+
+            return FitTableOnSinglePage(doc, tbl, fixedContentHeightCm, emptyRowStartIndex, emptyRowEndIndex, minRowHeightCm);
+        }
+
+        /// <summary>
+        /// 估算单行高度（pt）
+        /// </summary>
+        private double EstimateRowHeight(Row row)
+        {
+            double rowH = row.Height;
+            if (double.IsNaN(rowH) || rowH <= 0)
+            {
+                int maxParaCount = 1;
+                foreach (var cell in row.Cells)
+                {
+                    int paraTextLines = 0;
+                    foreach (var p in cell.Paragraphs)
+                    {
+                        paraTextLines += string.IsNullOrEmpty(p.Text) ? 1 : (int)Math.Ceiling(p.Text.Length / 20.0);
+                    }
+                    if (paraTextLines > maxParaCount)
+                        maxParaCount = paraTextLines;
+                }
+                rowH = maxParaCount * 14.0;
+            }
+            return rowH;
+        }
+
+        /// <summary>
+        /// 自动计算目标表格之外所有内容的总高度（pt），包括文档级段落和其他表格
+        /// </summary>
+        private double EstimateOtherContentHeightPt(DocX doc, Table targetTable)
+        {
+            double totalHeightPt = 0;
+            XNamespace w = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+
+            // 累加其他表格的所有行高
+            foreach (var tbl in doc.Tables)
+            {
+                if (tbl == targetTable)
+                    continue;
+                foreach (var row in tbl.Rows)
+                {
+                    totalHeightPt += EstimateRowHeight(row);
+                }
+            }
+
+            // 累加文档级段落的高度（通过XML祖先节点排除表格内的段落）
+            double pageWidthPt = (doc.PageWidth - doc.MarginLeft - doc.MarginRight) / OldVersionFactor;
+            foreach (var p in doc.Paragraphs)
+            {
+                if (p.Xml.Ancestors(w + "tc").Any())
+                    continue;
+
+                if (string.IsNullOrWhiteSpace(p.Text))
+                {
+                    totalHeightPt += 14.0;
+                }
+                else
+                {
+                    double charsPerLine = Math.Max(pageWidthPt / 7.0, 1);
+                    int lineCount = (int)Math.Ceiling(p.Text.Length / charsPerLine);
+                    totalHeightPt += lineCount * 14.0;
+                }
+            }
+
+            return totalHeightPt;
+        }
+
+        /// <summary>
+        /// 单页自适应（自动计算内容高度版本）：自动计算页面其他内容高度，通过压缩空白行行高使报告控制在1页内
+        /// </summary>
+        /// <param name="doc">文档对象</param>
+        /// <param name="tbl">报告主表格</param>
+        /// <param name="emptyRowStartIndex">空白行起始行索引（从0开始）</param>
+        /// <param name="emptyRowEndIndex">空白行结束行索引（从0开始，包含）</param>
+        /// <param name="minRowHeightCm">空白行最小行高（cm），防止压缩过度</param>
+        /// <returns></returns>
+        public Table FitTableOnSinglePage(DocX doc, Table tbl, int emptyRowStartIndex, int emptyRowEndIndex, double minRowHeightCm)
+        {
+            if (tbl == null)
+                return tbl;
+
+            double fixedContentHeightCm = EstimateOtherContentHeightPt(doc, tbl) * 0.0353;
+            return FitTableOnSinglePage(doc, tbl, fixedContentHeightCm, emptyRowStartIndex, emptyRowEndIndex, minRowHeightCm);
+        }
+
+        /// <summary>
+        /// 单页自适应（自动检测空白行+自动计算内容高度版本）：自动查找空白行并压缩，自动计算页面其他内容高度
+        /// </summary>
+        /// <param name="doc">文档对象</param>
+        /// <param name="tbl">报告主表格</param>
+        /// <param name="minRowHeightCm">空白行最小行高（cm）</param>
+        /// <returns></returns>
+        public Table FitTableOnSinglePageAuto(DocX doc, Table tbl, double minRowHeightCm)
+        {
+            if (tbl == null)
+                return tbl;
+
+            double fixedContentHeightCm = EstimateOtherContentHeightPt(doc, tbl) * 0.0353;
+            return FitTableOnSinglePageAuto(doc, tbl, fixedContentHeightCm, minRowHeightCm);
+        }
+
+        /// <summary>
         /// document合并
         /// </summary>
         /// <param name="oldDocument"></param>
