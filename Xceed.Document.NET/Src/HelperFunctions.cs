@@ -1561,6 +1561,56 @@ namespace Xceed.Document.NET
       return currentParagraphStyle;
     }
 
+    internal static XElement GetStyleFromStyleId( Document document, string styleIdToFind, bool includeParagraph, bool includeCharacter )
+    {
+      if( ( document == null ) || string.IsNullOrEmpty( styleIdToFind ) )
+        return null;
+
+      if( !includeParagraph && !includeCharacter )
+        return null;
+
+      var matchingStyles =
+        (
+            from s in document._styles.Element( Document.w + "styles" ).Elements( Document.w + "style" )
+            let type = s.Attribute( XName.Get( "type", Document.w.NamespaceName ) )
+            where ( type != null )
+               && ( ( includeParagraph && ( type.Value == "paragraph" ) )
+                 || ( includeCharacter && ( type.Value == "character" ) ) )
+            select s
+        );
+
+      return
+      (
+          from s in matchingStyles
+          let styleId = s.Attribute( XName.Get( "styleId", Document.w.NamespaceName ) )
+          where ( styleId != null ) && ( styleId.Value == styleIdToFind )
+          select s
+      ).FirstOrDefault();
+    }
+
+    internal static XElement GetStyleFromStyleName( Document document, string styleNameToFind, bool includeParagraph, bool includeCharacter )
+    {
+      if( ( document == null ) || string.IsNullOrEmpty( styleNameToFind ) )
+        return null;
+
+      if( !includeParagraph && !includeCharacter )
+        return null;
+
+      var matchingStyles =
+        (
+            from s in document._styles.Element( Document.w + "styles" ).Elements( Document.w + "style" )
+            let type = s.Attribute( XName.Get( "type", Document.w.NamespaceName ) )
+            where ( type != null )
+               && ( ( includeParagraph && ( type.Value == "paragraph" ) )
+                 || ( includeCharacter && ( type.Value == "character" ) ) )
+            select s
+        );
+
+      return matchingStyles.FirstOrDefault( x => ( x.Element( XName.Get( "name", Document.w.NamespaceName ) ) != null )
+                                             && ( x.Element( XName.Get( "name", Document.w.NamespaceName ) ).Attribute( XName.Get( "val", Document.w.NamespaceName ) ) != null )
+                                             && ( x.Element( XName.Get( "name", Document.w.NamespaceName ) ).Attribute( XName.Get( "val", Document.w.NamespaceName ) ).Value.ToLower().Equals( styleNameToFind.ToLower() ) ) );
+    }
+
     internal static void CopyStream( Stream input, Stream output, int bufferSize = 32768 )
     {
       byte[] buffer = new byte[ bufferSize ];

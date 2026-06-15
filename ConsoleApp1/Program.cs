@@ -82,20 +82,23 @@ namespace ConsoleApp1
             //double[] waterContents = { 7.4, 9.4, 11.3, 13.4, 15.4 };
             //double[] dryDensities = { 1.67, 1.79, 1.86, 1.81,1.70 };
 
-            string waterContents = "0.0714,0.0714,0.0514,0.0368,0.0238,0.0140,0.0101,0.0072,0.0051,0.0042,0.0015";
-            string dryDensities = "56.9,56.9,51.8,47.8,41.2,33.2,27.9,24.0,21.3,18.7,9.3";
+            //string waterContents = "0.0714,0.0714,0.0514,0.0368,0.0238,0.0140,0.0101,0.0072,0.0051,0.0042,0.0015";
+            //string dryDensities = "56.9,56.9,51.8,47.8,41.2,33.2,27.9,24.0,21.3,18.7,9.3";
 			//var result =imageHelper.GetCompactionCurvePeakNew(waterContents, dryDensities);
 
 
 
-			imageHelper.DrawParticleTthencheunakCurvePlot(waterContents, dryDensities, "粒径(mm)",
-				"小于某径土占总土质量百分比(%)", 500, 180, "DrawParticleTthencheunakCurvePlot.png",10,10);
+			//imageHelper.DrawParticleTthencheunakCurvePlot(waterContents, dryDensities, "粒径(mm)",
+			//	"小于某径土占总土质量百分比(%)", 500, 180, "DrawParticleTthencheunakCurvePlot.png",10,10);
             //Console.WriteLine(result);
             //imageHelper.TestScottPlot_45();
             //imageHelper.TestScottPlot_46_1();
             //imageHelper.TestScottPlot_46_2();
 
             //imageHelper.TestScottPlot_42();
+
+            testConvertWordFontEx();
+
             Console.WriteLine("执行成功");
             Console.ReadLine();
 
@@ -1075,6 +1078,57 @@ Conclusion</string>
 			return tablexml;
 
         }
+
+		/// <summary>
+		/// 测试 ConvertWordFont：转换 Word 文档正文样式字体
+		/// </summary>
+		private static void testConvertWordFont()
+		{
+			string testFile = @"D:\test.docx";
+
+			if (!File.Exists(testFile))
+			{
+				Console.WriteLine($"[ConvertWordFont] 测试文件不存在：{testFile}");
+				return;
+			}
+
+			// 备份原文件，避免覆盖
+			string backupFile = Path.Combine(
+				Path.GetDirectoryName(testFile),
+				Path.GetFileNameWithoutExtension(testFile) + "_backup" + Path.GetExtension(testFile));
+			File.Copy(testFile, backupFile, true);
+			Console.WriteLine($"[ConvertWordFont] 已备份至：{backupFile}");
+
+			var lims = new npLimsDocX.classLimsDocX();
+
+			// 转换字体为宋体、12磅，并应用网格格式
+			bool ok = lims.ConvertWordFont(testFile, "宋体", 12, true);
+			Console.WriteLine($"[ConvertWordFont] 结果：{(ok ? "成功" : "失败")}");
+		}
+
+		/// <summary>
+		/// 测试 ConvertWordFontEx：批量/指定样式字体转换
+		/// </summary>
+		private static void testConvertWordFontEx()
+		{
+			string sourceFile = @"D:\test_backup.docx";
+			if (!File.Exists(sourceFile))
+			{
+				Console.WriteLine($"[ConvertWordFontEx] 测试文件不存在：{sourceFile}");
+				return;
+			}
+
+			string testFile = @"D:\test_ex.docx";
+			File.Copy(sourceFile, testFile, true);
+			Console.WriteLine($"[ConvertWordFontEx] 已复制测试文件至：{testFile}");
+
+			var lims = new npLimsDocX.classLimsDocX();
+
+            // 指定 Normal + 标题 21，不改字号
+            //bool ok = lims.ConvertWordFontEx(testFile, "宋体", 0, new[] { "Normal", "211" }, false, true);
+            bool ok = lims.ConvertWordFont(testFile, "宋体", 6, true);
+            Console.WriteLine($"[ConvertWordFontEx] 指定样式（不改字号）：{(ok ? "成功" : "失败")}");
+		}
 
 		private static void combineDoc()
 		{

@@ -3130,6 +3130,356 @@ namespace Xceed.Document.NET
       }
     }
 
+    /// <summary>
+    /// 设置指定段落样式的字体。东亚字体与西文字体可分别指定。
+    /// </summary>
+    /// <param name="styleName">样式显示名称（如「正文」）或 styleId（如 Normal）</param>
+    /// <param name="eastAsiaFont">东亚字体名称</param>
+    /// <param name="asciiFont">西文字体名称</param>
+    /// <param name="fontSize">字号（磅）；&lt;=0 表示不改字号</param>
+    /// <returns>是否成功找到并更新样式</returns>
+    public bool SetParagraphStyleFont( string styleName, string eastAsiaFont, string asciiFont, double fontSize )
+    {
+      var paragraphStyle = this.TryGetParagraphStyle( styleName );
+      if( paragraphStyle == null )
+        return false;
+
+      this.SetStyleElementRunProperties( paragraphStyle, eastAsiaFont, asciiFont, fontSize );
+
+      paragraphStyle.Element( XName.Get( "autoRedefine", w.NamespaceName ) )?.Remove();
+
+      return true;
+    }
+
+    /// <summary>
+    /// 仅修改指定段落样式的字体名称，不改动字号，也不改写正文 run 的直接格式。
+    /// 行为对齐 Word Interop 的 Styles["正文"].Font.NameFarEast / NameAscii。
+    /// </summary>
+    public bool SetParagraphStyleFontFamily( string styleName, string eastAsiaFont, string asciiFont )
+    {
+      var paragraphStyle = this.TryGetParagraphStyle( styleName );
+      if( paragraphStyle == null )
+        return false;
+
+      this.SetStyleElementRunProperties( paragraphStyle, eastAsiaFont, asciiFont, 0 );
+
+      paragraphStyle.Element( XName.Get( "autoRedefine", w.NamespaceName ) )?.Remove();
+
+      return true;
+    }
+
+    /// <summary>
+    /// 批量设置样式字体。仅修改 styles.xml，不改 run 直接格式。
+    /// </summary>
+    /// <param name="styleNames">样式显示名或 styleId；null/空且 allStyles=false 时不修改</param>
+    /// <param name="eastAsiaFont">东亚字体名称</param>
+    /// <param name="asciiFont">西文字体名称</param>
+    /// <param name="fontSize">字号（磅）；&lt;=0 表示不改字号</param>
+    /// <param name="allStyles">true 时修改全部 paragraph + character 样式，忽略 styleNames</param>
+    /// <returns>实际成功更新的样式数量</returns>
+    public int SetStylesFont( IEnumerable<string> styleNames, string eastAsiaFont, string asciiFont, double fontSize = 0, bool allStyles = false )
+    {
+      if( _styles == null )
+        return 0;
+
+      var stylesRoot = _styles.Element( XName.Get( "styles", w.NamespaceName ) );
+      if( stylesRoot == null )
+        return 0;
+
+      List<XElement> targetStyles;
+
+      if( allStyles )
+      {
+        targetStyles =
+        (
+            from s in stylesRoot.Elements( XName.Get( "style", w.NamespaceName ) )
+            let type = s.Attribute( XName.Get( "type", w.NamespaceName ) )
+            where ( type != null ) && ( ( type.Value == "paragraph" ) || ( type.Value == "character" ) )
+            select s
+        ).ToList();
+      }
+      else
+      {
+        if( styleNames == null )
+          return 0;
+
+        var seenStyleIds = new HashSet<string>( StringComparer.Ordinal );
+        targetStyles = new List<XElement>();
+
+        foreach( var styleName in styleNames )
+        {
+          if( string.IsNullOrWhiteSpace( styleName ) )
+            continue;
+
+          var style = this.TryGetStyle( styleName, true, true, false );
+          if( style == null )
+            continue;
+
+          var styleId = style.Attribute( XName.Get( "styleId", w.NamespaceName ) )?.Value;
+          if( string.IsNullOrEmpty( styleId ) || !seenStyleIds.Add( styleId ) )
+            continue;
+
+          targetStyles.Add( style );
+        }
+      }
+
+      foreach( var style in targetStyles )
+      {
+        this.SetStyleElementRunProperties( style, eastAsiaFont, asciiFont, fontSize );
+        style.Element( XName.Get( "autoRedefine", w.NamespaceName ) )?.Remove();
+      }
+
+      return targetStyles.Count;
+    }
+
+    private XElement TryGetParagraphStyle( string styleName )
+    {
+      return this.TryGetStyle( styleName, true, false, true );
+    }
+
+    private XElement TryGetStyle( string styleName, bool includeParagraph, bool includeCharacter, bool fallbackToNormal )
+    {
+      if( _styles == null )
+        return null;
+
+      var style = !string.IsNullOrEmpty( styleName )
+        ? HelperFunctions.GetStyleFromStyleName( this, styleName, includeParagraph, includeCharacter )
+        : null;
+
+      if( style == null && !string.IsNullOrEmpty( styleName ) )
+        style = HelperFunctions.GetStyleFromStyleId( this, styleName, includeParagraph, includeCharacter );
+
+      if( ( style == null ) && fallbackToNormal && includeParagraph )
+        style = HelperFunctions.GetStyleFromStyleId( this, this.GetNormalStyleId(), true, false );
+
+      return style;
+    }
+
+    /// <summary>
+    /// 更新基于「正文/Normal」样式的所有派生段落样式字体。
+    /// </summary>
+    public void UpdateNormalBasedParagraphStyleFonts( string eastAsiaFont, string asciiFont, double fontSize )
+    {
+      if( _styles == null )
+        return;
+
+      var normalStyleId = this.GetNormalStyleId();
+      if( string.IsNullOrEmpty( normalStyleId ) )
+        return;
+
+      var stylesRoot = _styles.Element( XName.Get( "styles", w.NamespaceName ) );
+      if( stylesRoot == null )
+        return;
+
+      var paragraphStyles =
+        (
+            from s in stylesRoot.Elements( XName.Get( "style", w.NamespaceName ) )
+            let type = s.Attribute( XName.Get( "type", w.NamespaceName ) )
+            where ( type != null ) && ( type.Value == "paragraph" )
+            select s
+        ).ToList();
+
+      var styleById = paragraphStyles
+        .Where( s => s.Attribute( XName.Get( "styleId", w.NamespaceName ) ) != null )
+        .ToDictionary( s => s.Attribute( XName.Get( "styleId", w.NamespaceName ) ).Value );
+
+      foreach( var paragraphStyle in paragraphStyles )
+      {
+        var styleId = paragraphStyle.Attribute( XName.Get( "styleId", w.NamespaceName ) )?.Value;
+        if( string.IsNullOrEmpty( styleId ) )
+          continue;
+
+        if( styleId.Equals( normalStyleId, StringComparison.Ordinal ) )
+          continue;
+
+        var basedOnId = paragraphStyle.Element( XName.Get( "basedOn", w.NamespaceName ) )?.Attribute( XName.Get( "val", w.NamespaceName ) )?.Value;
+        while( !string.IsNullOrEmpty( basedOnId ) )
+        {
+          if( basedOnId.Equals( normalStyleId, StringComparison.Ordinal ) )
+          {
+            this.SetStyleElementRunProperties( paragraphStyle, eastAsiaFont, asciiFont, fontSize );
+            paragraphStyle.Element( XName.Get( "autoRedefine", w.NamespaceName ) )?.Remove();
+            break;
+          }
+
+          if( !styleById.TryGetValue( basedOnId, out var parentStyle ) )
+            break;
+
+          basedOnId = parentStyle.Element( XName.Get( "basedOn", w.NamespaceName ) )?.Attribute( XName.Get( "val", w.NamespaceName ) )?.Value;
+        }
+      }
+    }
+
+    /// <summary>
+    /// 对主文档正文（含表格内文字）所有 run 应用字体，覆盖直接格式。
+    /// </summary>
+    public void ApplyMainStoryRunFont( string eastAsiaFont, string asciiFont, double fontSize )
+    {
+      if( ( _mainDoc == null ) || ( _mainDoc.Root == null ) )
+        return;
+
+      var body = _mainDoc.Root.Element( XName.Get( "body", w.NamespaceName ) );
+      if( body == null )
+        return;
+
+      foreach( var paragraphXml in body.Descendants( XName.Get( "p", w.NamespaceName ) ) )
+      {
+        if( paragraphXml.Ancestors().FirstOrDefault( x => x.Name.Equals( XName.Get( "Fallback", mc.NamespaceName ) ) ) != null )
+          continue;
+
+        var paragraphRunProperties = paragraphXml.Element( XName.Get( "pPr", w.NamespaceName ) )?.Element( XName.Get( "rPr", w.NamespaceName ) );
+        if( paragraphRunProperties != null )
+          this.SetStyleElementRunProperties( paragraphRunProperties, eastAsiaFont, asciiFont, fontSize );
+      }
+
+      foreach( var runXml in body.Descendants( XName.Get( "r", w.NamespaceName ) ) )
+      {
+        if( runXml.Ancestors().FirstOrDefault( x => x.Name.Equals( XName.Get( "Fallback", mc.NamespaceName ) ) ) != null )
+          continue;
+
+        this.SetStyleElementRunProperties( runXml, eastAsiaFont, asciiFont, fontSize );
+      }
+    }
+
+    /// <summary>
+    /// 对主文档正文（含表格内段落）应用段落网格格式：不自动调整右缩进、不对齐文档网格。
+    /// </summary>
+    public void ApplyMainStoryParagraphGridFormat()
+    {
+      if( ( _mainDoc == null ) || ( _mainDoc.Root == null ) )
+        return;
+
+      var body = _mainDoc.Root.Element( XName.Get( "body", w.NamespaceName ) );
+      if( body == null )
+        return;
+
+      foreach( var paragraphXml in body.Descendants( XName.Get( "p", w.NamespaceName ) ) )
+      {
+        if( paragraphXml.Ancestors().FirstOrDefault( x => x.Name.Equals( XName.Get( "Fallback", mc.NamespaceName ) ) ) != null )
+          continue;
+
+        this.SetParagraphGridFormatOnElement( paragraphXml );
+      }
+    }
+
+    private void SetStyleElementRunProperties( XElement styleElement, string eastAsiaFont, string asciiFont, double fontSize )
+    {
+      this.SetStyleElementRunFontFamily( styleElement, eastAsiaFont, asciiFont );
+
+      if( fontSize <= 0 )
+        return;
+
+      var rPr = this.EnsureRunProperties( styleElement );
+
+      var sz = rPr.Element( XName.Get( "sz", w.NamespaceName ) );
+      if( sz == null )
+      {
+        rPr.Add( new XElement( XName.Get( "sz", w.NamespaceName ) ) );
+        sz = rPr.Element( XName.Get( "sz", w.NamespaceName ) );
+      }
+      sz.SetAttributeValue( XName.Get( "val", w.NamespaceName ), fontSize * 2 );
+
+      var szCs = rPr.Element( XName.Get( "szCs", w.NamespaceName ) );
+      if( szCs == null )
+      {
+        rPr.Add( new XElement( XName.Get( "szCs", w.NamespaceName ) ) );
+        szCs = rPr.Element( XName.Get( "szCs", w.NamespaceName ) );
+      }
+      szCs.SetAttributeValue( XName.Get( "val", w.NamespaceName ), fontSize * 2 );
+    }
+
+    private void SetStyleElementRunFontFamily( XElement styleElement, string eastAsiaFont, string asciiFont )
+    {
+      var rPr = this.EnsureRunProperties( styleElement );
+      var docDefaultsEastAsia = this.GetDocDefaultsEastAsiaFont();
+
+      if( !string.IsNullOrEmpty( eastAsiaFont )
+        && !string.IsNullOrEmpty( docDefaultsEastAsia )
+        && eastAsiaFont.Equals( docDefaultsEastAsia, StringComparison.Ordinal )
+        && ( string.IsNullOrEmpty( asciiFont ) || asciiFont.Equals( "Times New Roman", StringComparison.OrdinalIgnoreCase ) ) )
+      {
+        rPr.Element( XName.Get( "rFonts", w.NamespaceName ) )?.Remove();
+        return;
+      }
+
+      var rFonts = this.EnsureRunFonts( rPr );
+
+      if( !string.IsNullOrEmpty( eastAsiaFont ) )
+        rFonts.SetAttributeValue( XName.Get( "eastAsia", w.NamespaceName ), eastAsiaFont );
+
+      if( !string.IsNullOrEmpty( asciiFont ) )
+      {
+        rFonts.SetAttributeValue( XName.Get( "ascii", w.NamespaceName ), asciiFont );
+        rFonts.SetAttributeValue( XName.Get( "hAnsi", w.NamespaceName ), asciiFont );
+        rFonts.SetAttributeValue( XName.Get( "cs", w.NamespaceName ), asciiFont );
+      }
+    }
+
+    private XElement EnsureRunProperties( XElement styleElement )
+    {
+      var rPrName = XName.Get( "rPr", w.NamespaceName );
+      var rPr = styleElement.Name == rPrName
+        ? styleElement
+        : styleElement.Element( rPrName );
+
+      if( rPr == null )
+      {
+        styleElement.Add( new XElement( rPrName ) );
+        rPr = styleElement.Element( rPrName );
+      }
+
+      return rPr;
+    }
+
+    private XElement EnsureRunFonts( XElement rPr )
+    {
+      var rFonts = rPr.Element( XName.Get( "rFonts", w.NamespaceName ) );
+      if( rFonts == null )
+      {
+        rPr.AddFirst( new XElement( XName.Get( "rFonts", w.NamespaceName ) ) );
+        rFonts = rPr.Element( XName.Get( "rFonts", w.NamespaceName ) );
+      }
+
+      return rFonts;
+    }
+
+    private string GetDocDefaultsEastAsiaFont()
+    {
+      if( _styles == null )
+        return null;
+
+      return _styles
+        .Element( XName.Get( "styles", w.NamespaceName ) )
+        ?.Element( XName.Get( "docDefaults", w.NamespaceName ) )
+        ?.Element( XName.Get( "rPrDefault", w.NamespaceName ) )
+        ?.Element( XName.Get( "rPr", w.NamespaceName ) )
+        ?.Element( XName.Get( "rFonts", w.NamespaceName ) )
+        ?.Attribute( XName.Get( "eastAsia", w.NamespaceName ) )
+        ?.Value;
+    }
+
+    private void SetParagraphGridFormatOnElement( XElement paragraphXml )
+    {
+      var pPr = paragraphXml.Element( XName.Get( "pPr", w.NamespaceName ) );
+      if( pPr == null )
+      {
+        paragraphXml.AddFirst( new XElement( XName.Get( "pPr", w.NamespaceName ) ) );
+        pPr = paragraphXml.Element( XName.Get( "pPr", w.NamespaceName ) );
+      }
+
+      var adjustRightInd = pPr.Element( XName.Get( "adjustRightInd", w.NamespaceName ) );
+      if( adjustRightInd == null )
+        pPr.Add( new XElement( XName.Get( "adjustRightInd", w.NamespaceName ), new XAttribute( XName.Get( "val", w.NamespaceName ), "0" ) ) );
+      else
+        adjustRightInd.SetAttributeValue( XName.Get( "val", w.NamespaceName ), "0" );
+
+      var snapToGrid = pPr.Element( XName.Get( "snapToGrid", w.NamespaceName ) );
+      if( snapToGrid == null )
+        pPr.Add( new XElement( XName.Get( "snapToGrid", w.NamespaceName ), new XAttribute( XName.Get( "val", w.NamespaceName ), "0" ) ) );
+      else
+        snapToGrid.SetAttributeValue( XName.Get( "val", w.NamespaceName ), "0" );
+    }
+
 
 
 

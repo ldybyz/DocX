@@ -42,6 +42,91 @@ namespace npLimsDocX
         }
 
         /// <summary>
+        /// 转换 Word 文档正文样式字体（基于 Xceed，无需安装 Microsoft Word）
+        /// </summary>
+        /// <param name="strSourcePath">文档路径（仅支持 .docx）</param>
+        /// <param name="fontName">东亚正文字体</param>
+        /// <param name="fontSize">正文字号（磅）；&lt;=0 表示不改字号</param>
+        /// <param name="bFormat">是否对正文段落应用网格格式（不自动调整右缩进、不对齐文档网格）</param>
+        public bool ConvertWordFont(string strSourcePath, string fontName, double fontSize, bool bFormat)
+        {
+            if (string.IsNullOrEmpty(strSourcePath) || !File.Exists(strSourcePath))
+                return false;
+
+            if (!Path.GetExtension(strSourcePath).Equals(".docx", StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            try
+            {
+                using (var document = DocX.Load(strSourcePath))
+                {
+                    const string asciiFont = "Times New Roman";
+                    bool styleUpdated = document.SetParagraphStyleFont("正文", fontName, asciiFont, fontSize);
+                    if (!styleUpdated)
+                        styleUpdated = document.SetParagraphStyleFont("Normal", fontName, asciiFont, fontSize);
+
+                    if (!styleUpdated)
+                        return false;
+
+                    if (bFormat)
+                        document.ApplyMainStoryParagraphGridFormat();
+
+                    document.Save();
+                }
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 扩展：批量转换 Word 文档样式字体（基于 Xceed，无需安装 Microsoft Word）
+        /// </summary>
+        /// <param name="strSourcePath">文档路径（仅支持 .docx）</param>
+        /// <param name="fontName">东亚字体</param>
+        /// <param name="fontSize">字号（磅）；&lt;=0 表示不改字号</param>
+        /// <param name="styleNames">要修改的样式显示名或 styleId 列表；allStyles=true 时可传 null</param>
+        /// <param name="allStyles">true 时修改全部 paragraph + character 样式</param>
+        /// <param name="bFormat">是否对正文段落应用网格格式</param>
+        public bool ConvertWordFontEx(string strSourcePath, string fontName, double fontSize, IEnumerable<string> styleNames, bool allStyles, bool bFormat)
+        {
+            if (string.IsNullOrEmpty(strSourcePath) || !File.Exists(strSourcePath))
+                return false;
+
+            if (!Path.GetExtension(strSourcePath).Equals(".docx", StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            if (!allStyles && (styleNames == null || !styleNames.Any()))
+                return false;
+
+            try
+            {
+                using (var document = DocX.Load(strSourcePath))
+                {
+                    const string asciiFont = "Times New Roman";
+                    int updatedCount = document.SetStylesFont(styleNames, fontName, asciiFont, fontSize, allStyles);
+
+                    if (updatedCount <= 0)
+                        return false;
+
+                    if (bFormat)
+                        document.ApplyMainStoryParagraphGridFormat();
+
+                    document.Save();
+                }
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// 生成一个表格
         /// </summary>
         /// <param name="doc"></param>
